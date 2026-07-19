@@ -1,0 +1,14 @@
+models:
+  conversation:
+    model: meta-llama/llama-3.3-70b-instruct
+    provider: openrouter
+  embedding:
+    dimensions: 2048
+    model: nvidia/llama-nemotron-embed-vl-1b-v2:free
+    provider: openrouter
+  extraction:
+    model: meta-llama/llama-3.3-70b-instruct
+    provider: openrouter
+  reasoning:
+    model: meta-llama/llama-3.3-70b-instruct
+    provider: openrouter

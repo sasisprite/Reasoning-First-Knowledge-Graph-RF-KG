@@ -1,0 +1,24 @@
+# Virtual environments
+backend/venv/
+venv/
+
+# Environment files
+backend/.env
+.env
+
+# Dependencies
+frontend/node_modules/
+node_modules/
+
+# Compilation caches & logs
+__pycache__/
+*.pyc
+backend/*.log
+frontend/*.log
+*.log
+
+# System files
+.DS_Store
+dist/
+build/
+frontend/dist/
