@@ -22,21 +22,27 @@ RF-KG solves this by:
 
 ```mermaid
 graph TD
-    subgraph Ingestion Pipeline (Modular)
-        Doc[Document Upload] --> Parser[Document Parser]
-        Parser --> Chunker[Semantic Chunker]
-        Chunker --> LLM_Ext[LLM Reasoning & Extraction]
-        LLM_Ext --> Embed[Vector Embedding Generator]
-        Embed --> Neo4j[(Neo4j Graph Database)]
-    end
+    %% Frontend Clients
+    UI_Ing["React UI: Upload Sidebar"] -->|POST /documents| API_Doc["FastAPI: upload_document"]
+    UI_Graph["React UI: D3.js Network Graph"] -->|GET /graph| API_Graph["FastAPI: get_graph"]
+    UI_Chat["React UI: Floating Chat Overlay"] -->|POST /chat| API_Chat["FastAPI: chat"]
 
-    subgraph Retrieval Agent (Modular)
-        Query[User Chat Query] --> Map[Entity Mapping]
-        Map --> Graph_Ret[Neo4j Context Retrieval]
-        Graph_Ret --> Reasoning_Eval[Reasoning Property Evaluation]
-        Reasoning_Eval --> Synthesis[Response Synthesis]
-        Synthesis --> Output[Answer + Step Log]
-    end
+    %% Ingestion Pipeline
+    API_Doc -->|Background Task| Proc["Document Processor"]
+    Proc -->|1. Parse| Parser["Parser: PyPDF2/Docx/Txt"]
+    Parser -->|2. Chunk| Chunker["Semantic Chunker"]
+    Chunker -->|3. Extract Reasoning| LLM_Or["LLM: Llama 3.3 70B via OpenRouter"]
+    LLM_Or -->|4. Embed Reasoning| Embed["Embeddings: Llama-Nemotron via OpenRouter"]
+    Embed -->|5. Store Nodes & Edges| DB[("Neo4j Database")]
+
+    %% Retrieval Pipeline
+    API_Chat -->|Invoke| Ret["Retrieval Agent"]
+    Ret -->|1. Map Entities| Mapping["LLM: Match query terms to entities"]
+    Mapping -->|2. Vector Search| DB
+    DB -->|3. Fetch Subgraph & Reasoning| Ret
+    Ret -->|4. Synthesise Answer| LLM_Or
+    LLM_Or -->|5. Format Answer| API_Chat
+    API_Chat -->|Return Response + Step Log| UI_Chat
 ```
 
 ---
